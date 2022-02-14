@@ -27,6 +27,17 @@ module.exports = class Product {
     }
 
     static fetchAll() {
+        const p = path.join(
+            require.main.filename, 
+               '../', 'data', 
+                'products.json'
+            );
+        fs.readFile(p, (err, fileContent) => {
+            if(err){
+                return [];
+            }
+            return JSON.parse(fileContent);
+        })
         return products;
     }
 }
