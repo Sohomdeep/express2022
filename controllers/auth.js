@@ -6,14 +6,22 @@ const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 const User = require('../models/user');
 
-const transporter = nodemailer.createTransport(
-  sendgridTransport({
-    auth: {
-      api_key:
-        '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'
-    }
-  })
-);
+// const transporter = nodemailer.createTransport(
+//   sendgridTransport({
+//     auth: {
+//       api_key:
+//         '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'
+//     }
+//   })
+// );
+
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+      user: "way.no.reply@gmail.com",
+      pass: "iyvkdiasxzhodnqc"
+  }
+});
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
@@ -169,4 +177,26 @@ exports.postReset = (req, res, next) => {
         console.log(err);
       });
   });
+};
+
+exports.getNewPassword = (req, res, next) => {
+  const token = req.params.token;
+  User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
+    .then(user => {
+      let message = req.flash('error');
+      if (message.length > 0) {
+        message = message[0];
+      } else {
+        message = null;
+      }
+      res.render('auth/new-password', {
+        path: '/new-password',
+        pageTitle: 'New Password',
+        errorMessage: message,
+        userId: user._id.toString()
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
